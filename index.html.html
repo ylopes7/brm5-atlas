@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#070d12">
+<title>BRM5 — ATLAS / Survival PvP</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap');
+:root{--bg:#070d12;--surface:#101a20;--panel:#152129;--line:#293b45;--text:#eaf1ed;--muted:#9aadb3;--lime:#c6f18e;--gold:#ffdb48;--cyan:#7ed5e7}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.55 Inter,Arial,sans-serif}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:9;background:repeating-linear-gradient(0deg,transparent 0 4px,#ffffff02 5px)}
+a{text-decoration:none;color:inherit}button{font:inherit;cursor:pointer}button:focus-visible,a:focus-visible{outline:2px solid var(--lime);outline-offset:3px}
+.shell{width:min(1400px,calc(100% - 36px));margin:auto}
+header{position:sticky;top:0;z-index:30;background:#081017ed;border-bottom:1px solid #30424a;backdrop-filter:blur(15px)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:20px;min-height:74px}
+.brand{font:800 23px 'Barlow Condensed',sans-serif;letter-spacing:2px}.brand b{color:var(--lime)}
+nav{display:flex;gap:22px}nav a{font:600 11px 'IBM Plex Mono',monospace;letter-spacing:1px;color:#b6c6c8}
+nav a:hover{color:var(--lime)}
+.live{font:600 10px 'IBM Plex Mono',monospace;color:var(--lime);letter-spacing:1px}.live:before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--lime);box-shadow:0 0 15px var(--lime);margin-right:8px;animation:pulse 1.5s infinite}
+@keyframes pulse{50%{opacity:.35}}@keyframes rise{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.hero{min-height:480px;position:relative;overflow:hidden;border-bottom:1px solid var(--line);background:radial-gradient(ellipse at 72% 38%,#31483b70,transparent 43%),linear-gradient(135deg,#0b151b,#060b10)}
+.hero .shell{position:relative;z-index:2;padding:85px 0 72px}.hero-art{position:absolute;right:-4%;top:-10%;height:120%;width:70%;opacity:.4;transform:skewX(-12deg);background:repeating-linear-gradient(90deg,transparent 0 80px,#9ed39c18 82px,#9ed39c18 84px),repeating-linear-gradient(0deg,transparent 0 60px,#9ed39c18 62px,#9ed39c18 64px);mask-image:linear-gradient(90deg,transparent,#000)}
+.hero-art:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#080f14,transparent)}
+.kicker{font:600 11px 'IBM Plex Mono',monospace;color:var(--lime);letter-spacing:2.6px}
+h1,h2,h3{font-family:'Barlow Condensed',Impact,sans-serif;line-height:1.02;text-transform:uppercase}
+h1{font-size:clamp(62px,10vw,142px);letter-spacing:-1.5px;margin:22px 0 12px;max-width:1050px}
+h1 em{font-style:normal;color:var(--lime)}
+.hero p{max-width:560px;color:#bac9ca;font-size:15px}.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+.cta{border:1px solid var(--lime);background:var(--lime);color:#0a1410;padding:14px 21px;font:700 12px 'IBM Plex Mono',monospace;text-transform:uppercase}
+.cta.alt{background:#0a1410b5;color:var(--lime)}
+.strip{display:flex;gap:28px;margin-top:45px;flex-wrap:wrap}.stat{border-left:2px solid var(--lime);padding-left:13px}.stat b{display:block;font:800 29px 'Barlow Condensed',sans-serif}.stat span{font:500 10px 'IBM Plex Mono',monospace;color:var(--muted);letter-spacing:1px}
+section{padding:70px 0}.section-head{display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:25px}.section-head h2{font-size:clamp(40px,6vw,67px);margin:10px 0}.section-head p{color:var(--muted);max-width:400px}
+.map-layout{display:grid;grid-template-columns:minmax(0,1fr) 285px;gap:14px}.map-panel,.side,.formation-card{background:var(--surface);border:1px solid var(--line)}
+.map-toolbar{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:15px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.mono{font:600 11px 'IBM Plex Mono',monospace;letter-spacing:1px}
+.controls{display:flex;gap:6px}.control{background:#1b2b33;color:var(--text);border:1px solid #40535b;padding:8px 12px}.control:hover{border-color:var(--lime)}
+.map-viewport{height:650px;overflow:hidden;position:relative;touch-action:pan-y;background:#0b1921}
+#map-svg{width:100%;height:100%;display:block;transition:transform .22s ease;transform-origin:center}
+.map-scan{position:absolute;inset:0;pointer-events:none;background:linear-gradient(0deg,transparent 40%,#b2efb40a 50%,transparent 60%);animation:scan 9s linear infinite}
+@keyframes scan{0%{transform:translateY(-80%)}100%{transform:translateY(80%)}}
+.map-caption{padding:12px 15px;color:#9aafb6;font:11px 'IBM Plex Mono',monospace;border-top:1px solid var(--line)}
+.side{padding:22px}.side h3{font-size:27px;margin:0 0 14px}.legend{display:flex;align-items:center;gap:10px;margin:13px 0;color:#d3dede;font-size:12px}.swatch{width:14px;height:14px;display:inline-block;background:#647b84}.swatch.yellow{background:#ffdb48;box-shadow:0 0 14px #ffdb48b5}.swatch.blue{background:#67d8f2}.swatch.green{background:#b9e98d}
+.poi{width:100%;text-align:left;padding:12px;margin:5px 0;background:#16262f;border:1px solid #2e4551;color:var(--text)}.poi:hover,.poi.active{border-color:var(--lime);background:#22352e}.poi small{display:block;color:var(--muted);margin-top:3px}
+.note{color:var(--muted);font-size:12px;margin-top:20px;border-top:1px solid var(--line);padding-top:15px}
+.filters{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:20px}.pill{background:#122028;border:1px solid #38515a;color:#b9c9ca;padding:10px 15px;font:600 11px 'IBM Plex Mono',monospace}
+.pill.active{background:var(--lime);border-color:var(--lime);color:#0b1712}
+.counter{font:500 11px 'IBM Plex Mono',monospace;color:var(--muted);margin-bottom:15px}
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.formation-card{overflow:hidden;animation:rise .35s both}
+.card-top{padding:22px 23px 12px;display:flex;justify-content:space-between;gap:15px}
+.card-top h3{font-size:29px;margin:8px 0}.badge{border:1px solid #5c7867;color:var(--lime);padding:5px 8px;font:600 10px 'IBM Plex Mono',monospace;white-space:nowrap;height:max-content}
+.card-desc{color:#9fb1b4;padding:0 23px 17px;min-height:65px}
+.stage-tabs{display:flex;gap:5px;padding:0 15px 12px}.stage{flex:1;border:1px solid #3b4c53;background:#17252c;color:#a8bcc0;padding:9px 3px;font:600 10px 'IBM Plex Mono',monospace}.stage.active{background:#314c39;border-color:var(--lime);color:#e6ffd6}
+.stage-image{width:100%;aspect-ratio:16/10;display:block;background:#0c171e}
+.miniatures{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;padding:12px 15px}.miniatures img{width:100%;aspect-ratio:16/10;object-fit:cover;border:1px solid #32454c;cursor:pointer}.miniatures img:hover{border-color:var(--lime)}
+.card-foot{display:flex;justify-content:space-between;gap:8px;padding:14px 22px;border-top:1px solid var(--line);font:10px 'IBM Plex Mono',monospace;color:#a2b5b8}
+footer{border-top:1px solid var(--line);padding:30px 0;color:#84999f;font:11px 'IBM Plex Mono',monospace}
+@media(max-width:950px){.map-layout{grid-template-columns:1fr}.side{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.side h3,.side .note{grid-column:1/-1}.map-viewport{height:530px}}
+@media(max-width:680px){.top{min-height:64px}.live{display:none}nav{gap:13px}nav a{font-size:10px}.hero .shell{padding:67px 0 45px}.hero{min-height:470px}.cards{grid-template-columns:1fr}.map-viewport{height:440px}.side{display:block}.section-head{display:block}.strip{gap:17px}section{padding:50px 0}.card-top h3{font-size:27px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
+
+ /* COMMAND COMMS / cinematic refinements */
+ :root{--neon:#c9ff89}
+ body{background:radial-gradient(ellipse at 85% 3%,#24423645,transparent 35%),#070d12}
+ .hero{min-height:560px;background:radial-gradient(circle at 78% 42%,#638c6a35,transparent 32%),linear-gradient(115deg,#060b10 20%,#0c1c24 65%,#061016)}
+ .hero:after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,#070d12 0%,transparent 65%),repeating-linear-gradient(0deg,transparent 0 5px,#baff8a06 6px)}
+ .hero .shell{z-index:3}
+ .hero-art{opacity:.75;animation:citydrift 16s ease-in-out infinite alternate}
+ @keyframes citydrift{to{transform:translateX(-35px) skewX(-12deg);opacity:.38}}
+ .hero:before{content:"";position:absolute;z-index:1;width:420px;height:420px;right:7%;top:8%;border-radius:50%;border:1px solid #bdfc8944;background:repeating-radial-gradient(circle,#bdfc890a 0 1px,transparent 2px 58px),conic-gradient(from 0deg,transparent 0 275deg,#bafc8830 340deg,transparent 360deg);box-shadow:0 0 110px #a1ed6540,inset 0 0 60px #a1ed6514;animation:radarTurn 10s linear infinite}
+ @keyframes radarTurn{to{transform:rotate(360deg)}}
+ .hero h1{filter:drop-shadow(0 12px 28px #0009);animation:titleIn 1s both}
+ @keyframes titleIn{from{opacity:0;transform:translateY(35px);filter:blur(10px)}to{opacity:1;transform:translateY(0);filter:blur(0)}}
+ .kicker{animation:signal 4s ease-in-out infinite}
+ @keyframes signal{50%{text-shadow:0 0 18px #c9ff89aa}}
+ .cta,.pill,.control,.stage,.poi{transition:transform .22s ease,background .22s ease,box-shadow .22s ease,border-color .22s ease}
+ .cta:hover{transform:translateY(-4px);box-shadow:0 12px 36px #b4f18a33}
+ .pill:hover,.control:hover,.stage:hover{transform:translateY(-2px)}
+ .formation-card{transition:transform .3s,border-color .3s,box-shadow .3s}
+ .formation-card:hover{transform:translateY(-5px);border-color:#8fbd88;box-shadow:0 22px 55px #0007,0 0 25px #c9ff8910}
+ .map-panel{box-shadow:0 24px 80px #0007}
+ .map-viewport:after{content:"";position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 100px #050c13}
+ .comms{padding-top:30px;border-top:1px solid #30454b;background:linear-gradient(180deg,#0b141b,#0a161b)}
+ .comms-head{display:flex;align-items:end;justify-content:space-between;gap:25px;flex-wrap:wrap;margin-bottom:24px}
+ .comms-head h2{font-size:clamp(42px,7vw,76px);margin:10px 0}
+ .comms-head p{color:#a3b9bb;max-width:410px}
+ .comms-layout{display:grid;grid-template-columns:290px 1fr;gap:18px}
+ .comms-sidebar{padding:22px;background:linear-gradient(145deg,#172b30,#0e1c24);border:1px solid #3b5a59;position:relative;overflow:hidden}
+ .comms-sidebar:after{content:"";position:absolute;width:220px;height:220px;right:-100px;bottom:-110px;border:1px solid #c6f18e55;border-radius:50%;box-shadow:0 0 0 40px #c6f18e09,0 0 0 80px #c6f18e06}
+ .comms-sidebar h3{font-size:34px;margin:14px 0}
+ .comms-sidebar p{color:#adc1bf;font-size:13px}
+ .radio-wave{display:flex;align-items:center;gap:4px;height:50px;margin-top:25px}
+ .radio-wave span{width:4px;height:12px;background:var(--lime);border-radius:5px;animation:wave 1.1s ease-in-out infinite alternate}
+ .radio-wave span:nth-child(2n){animation-delay:.2s}.radio-wave span:nth-child(3n){animation-delay:.5s}
+ @keyframes wave{to{height:44px;opacity:.45}}
+ .comms-main{min-width:0}
+ .comms-search{width:100%;background:#111f27;color:#e9f6f0;border:1px solid #3b575e;padding:15px 18px;outline:none;font:13px 'IBM Plex Mono',monospace}
+ .comms-search:focus{border-color:var(--lime);box-shadow:0 0 0 3px #c6f18e14}
+ .comms-tabs{display:flex;flex-wrap:wrap;gap:7px;margin:13px 0}
+ .comms-tab{padding:10px 14px;background:#15242b;color:#bacbca;border:1px solid #39515a;font:600 11px 'IBM Plex Mono',monospace}
+ .comms-tab.active{background:var(--lime);color:#0b1813;border-color:var(--lime)}
+ .comms-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+ .call{background:linear-gradient(110deg,#172830,#101d24);border:1px solid #344c55;padding:16px;display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:92px;text-align:left;color:inherit;position:relative;overflow:hidden}
+ .call:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--lime);opacity:.65}
+ .call:hover{border-color:var(--lime);background:#20362e;transform:translateY(-2px)}
+ .call strong{display:block;font:800 23px 'Barlow Condensed',sans-serif;color:var(--lime);letter-spacing:.3px}
+ .call small{display:block;color:#aabfc1;margin-top:4px;font-size:11px}
+ .copy-icon{font:600 10px 'IBM Plex Mono',monospace;color:#d0e5d1;border:1px solid #47614d;padding:7px;white-space:nowrap}
+ .toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,20px);opacity:0;pointer-events:none;z-index:90;background:#c6f18e;color:#101e17;padding:12px 22px;font:700 12px 'IBM Plex Mono',monospace;transition:.25s}
+ .toast.show{opacity:1;transform:translate(-50%,0)}
+ .comms-tip{font:11px 'IBM Plex Mono',monospace;color:#8ea5a6;margin-top:14px}
+ @media(max-width:800px){.comms-layout{grid-template-columns:1fr}.comms-sidebar{padding:18px}.radio-wave{margin-top:5px}.hero:before{right:-180px;opacity:.45}}
+ @media(max-width:540px){.comms-grid{grid-template-columns:1fr}.hero{min-height:540px}.hero:before{width:300px;height:300px;top:35px;right:-160px}.call{min-height:80px}}
+</style></head>
+<body><header><div class="shell top"><a href="#inicio" class="brand">BLACKHAWK <b>// ATLAS</b></a><nav><a href="#mapa">MAPA</a><a href="#formacoes">FORMAÇÕES</a><a href="#comunicacao">RÁDIO</a></nav><span class="live">SURVIVAL / PVP</span></div></header>
+<div class="hero" id="inicio"><div class="hero-art"></div><div class="shell"><div class="kicker">FIELD OPERATIONS / LOWER MANHATTAN / SURVIVAL</div><h1>DOMINE<br><em>AS RUAS.</em></h1><p>Atlas visual e formações para equipes de 2, 3 e 4 jogadores. Cenários de avenidas largas, cruzamentos, áreas urbanas e zonas de quarentena.</p><div class="actions"><a class="cta" href="#mapa">EXPLORAR O MAPA ↗</a><a class="cta alt" href="#formacoes">VER FORMAÇÕES ↗</a><a class="cta alt" href="#comunicacao">CÓDIGOS DE RÁDIO ↗</a></div><div class="strip"><div class="stat"><b>27</b><span>FORMAÇÕES</span></div><div class="stat"><b>81</b><span>DIAGRAMAS ORIGINAIS</span></div><div class="stat"><b>03</b><span>MODOS TÁTICOS</span></div></div></div></div>
+<section id="mapa"><div class="shell"><div class="section-head"><div><div class="kicker">01 / ATLAS AUTORAL</div><h2>MAPA DE OPERAÇÕES</h2></div><p>Representação esquemática original inspirada na malha urbana de Lower Manhattan. Ruas amplas, setores e quarentenas com destaque visual.</p></div>
+<div class="map-layout" style="grid-template-columns:minmax(0,1fr) 300px">
+<div class="map-panel" id="brm5-map-fullscreen">
+<div class="map-toolbar"><span class="mono">MAPA COMUNITÁRIO REAL / BRMAP5</span><button type="button" id="brm5-fullscreen-toggle" class="cta alt" style="padding:8px 12px;font-size:10px;cursor:pointer" aria-label="Exibir somente o mapa em tela cheia">⛶ TELA CHEIA</button></div>
+<iframe title="Mapa interativo BRMAP5 de Zombies Survival" src="https://www.brmap5.com/" loading="lazy" style="width:100%;height:680px;min-height:65vh;border:0;background:#0b151a" allowfullscreen></iframe>
+<div class="map-caption">MAPA EXTERNO INCORPORADO COM CRÉDITOS • FOTOS E MARCADORES SÃO DO BRMAP5 • REQUER INTERNET</div></div>
+<aside class="side"><h3>LOCAIS REAIS</h3>
+<p style="color:#b5c9ca">Selecione um marcador dentro do mapa para consultar informações e fotos do jogo quando disponibilizadas pelo BRMAP5.</p>
+<div class="legend"><span class="swatch yellow"></span> Zonas de quarentena</div>
+<div class="legend"><span class="swatch blue"></span> Água e referências da orla</div>
+<div class="legend"><span class="swatch green"></span> Pontos de interesse</div>
+<a class="cta" style="display:block;text-align:center;margin:15px 0" href="https://www.brmap5.com/" target="_blank" rel="noopener">VER FOTOS E LOCAIS ↗</a>
+<p class="note">Créditos: mapa interativo BRMAP5, de Noah Linker. A incorporação depende de permissão técnica do site externo. Caso o mapa não apareça aqui, use o botão acima.</p>
+<p class="note">A Wiki de Zombies Rescue não descreve necessariamente as regras do Survival. Confirme os marcadores e acessos na partida.</p>
+</aside></div></div></section>
+<section id="formacoes"><div class="shell"><div class="section-head"><div><div class="kicker">02 / TEAM OPERATIONS</div><h2>FORMAÇÕES DE EQUIPE</h2></div><p>Diagramas superiores originais inspirados em ruas largas, cruzamentos e obstáculos urbanos. Selecione o grupo, o cenário e a etapa.</p></div>
+<div class="filters" id="teams"><button class="pill active" data-team="duo">DUO / 02</button><button class="pill" data-team="trio">TRIO / 03</button><button class="pill" data-team="squad">SQUAD / 04</button></div>
+<div class="filters" id="cats"><button class="pill active" data-cat="horda">HORDAS / 03</button><button class="pill" data-cat="pvp">PVP / 03</button><button class="pill" data-cat="rua">RUAS / 03</button></div>
+<div class="counter" id="count"></div><div class="cards" id="cards"></div></div></section>
+<section class="comms" id="comunicacao"><div class="shell">
+<div class="comms-head"><div><div class="kicker">03 / SQUAD COMMUNICATIONS</div><h2>RÁDIO / CHAT RÁPIDO</h2></div><p>Frases curtas e fáceis de memorizar para comunicação em partidas PvP. Toque em uma chamada para copiar.</p></div>
+<div class="comms-layout"><aside class="comms-sidebar"><div class="kicker">FREQUÊNCIA // EQUIPE</div><h3>FALA CURTA.<br>TIME ALINHADO.</h3><p>Use referências compartilhadas, como sua frente, sua esquerda ou um ponto marcado no mapa. Evite “lá” e “ali” quando não estiver claro para todos.</p><div class="radio-wave" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div><div class="comms-tip">● CANAL SIMULADO / SEM ÁUDIO</div></aside>
+<div class="comms-main"><input class="comms-search" id="commsSearch" placeholder="BUSCAR CHAMADA... EX.: ESQUERDA, RECUAR" aria-label="Buscar chamada de rádio">
+<div class="comms-tabs" id="commsTabs"><button class="comms-tab active" data-radio="todos">TODOS</button><button class="comms-tab" data-radio="contato">CONTATO</button><button class="comms-tab" data-radio="equipe">EQUIPE</button><button class="comms-tab" data-radio="movimento">MOVIMENTO</button><button class="comms-tab" data-radio="horda">HORDA</button><button class="comms-tab" data-radio="franco">OBSERVADOR / FRANCO</button></div>
+<div class="comms-grid" id="commsGrid"></div><div class="comms-tip">DICA: diga o setor e depois a informação. Ex.: “contato, esquerda” • As expressões são sugestões de comunicação, não comandos oficiais do BRM5.</div></div></div></div></section><div class="toast" id="radioToast" role="status">Frase copiada</div>
+<footer><div class="shell">BRM5 // ATLAS INDEPENDENTE • DIAGRAMAS AUTORAIS • MAPA EXTERNO BRMAP5 POR NOAH LINKER • NÃO AFILIADO À PLATINUM FIVE OU ROBLOX</div></footer>
+<script>
+const formations=[{"id": "duo-horda-0", "team": "duo", "category": "horda", "n": 2, "title": "Contenção de Avenida — Paralelo de Avenida", "desc": "Dois jogadores ocupam faixas diferentes da via, mantendo observação dos acessos.", "location": "Eixo Norte", "variant": 0}, {"id": "duo-horda-1", "team": "duo", "category": "horda", "n": 2, "title": "Retirada Progressiva — Coluna de Travessia", "desc": "Um operador observa a direção de deslocamento e outro acompanha a retaguarda.", "location": "Centro Urbano", "variant": 1}, {"id": "duo-horda-2", "team": "duo", "category": "horda", "n": 2, "title": "Ponto de Reagrupamento — Dupla de Reagrupamento", "desc": "Os dois mantêm um ponto de encontro próximo de cobertura.", "location": "Quarteirão Oeste", "variant": 2}, {"id": "duo-pvp-0", "team": "duo", "category": "pvp", "n": 2, "title": "Cobertura de Cruzamento — Paralelo de Avenida", "desc": "Dois jogadores ocupam faixas diferentes da via, mantendo observação dos acessos.", "location": "Eixo Norte", "variant": 0}, {"id": "duo-pvp-1", "team": "duo", "category": "pvp", "n": 2, "title": "Rotação entre Abrigos — Coluna de Travessia", "desc": "Um operador observa a direção de deslocamento e outro acompanha a retaguarda.", "location": "Centro Urbano", "variant": 1}, {"id": "duo-pvp-2", "team": "duo", "category": "pvp", "n": 2, "title": "Proteção de Aliado — Dupla de Reagrupamento", "desc": "Os dois mantêm um ponto de encontro próximo de cobertura.", "location": "Quarteirão Oeste", "variant": 2}, {"id": "duo-rua-0", "team": "duo", "category": "rua", "n": 2, "title": "Travessia de Avenida — Paralelo de Avenida", "desc": "Dois jogadores ocupam faixas diferentes da via, mantendo observação dos acessos.", "location": "Eixo Norte", "variant": 0}, {"id": "duo-rua-1", "team": "duo", "category": "rua", "n": 2, "title": "Progressão em Via Larga — Coluna de Travessia", "desc": "Um operador observa a direção de deslocamento e outro acompanha a retaguarda.", "location": "Centro Urbano", "variant": 1}, {"id": "duo-rua-2", "team": "duo", "category": "rua", "n": 2, "title": "Controle de Interseção — Dupla de Reagrupamento", "desc": "Os dois mantêm um ponto de encontro próximo de cobertura.", "location": "Quarteirão Oeste", "variant": 2}, {"id": "trio-horda-0", "team": "trio", "category": "horda", "n": 3, "title": "Contenção de Avenida — Triângulo Urbano", "desc": "Dois operadores observam laterais enquanto o terceiro acompanha a retaguarda.", "location": "Eixo Norte", "variant": 0}, {"id": "trio-horda-1", "team": "trio", "category": "horda", "n": 3, "title": "Retirada Progressiva — Trio em Escalonamento", "desc": "Três jogadores se distribuem ao longo da calçada com espaços entre si.", "location": "Centro Urbano", "variant": 1}, {"id": "trio-horda-2", "team": "trio", "category": "horda", "n": 3, "title": "Ponto de Reagrupamento — Núcleo de Recuperação", "desc": "Um jogador auxilia um aliado e os outros mantêm observação do entorno.", "location": "Quarteirão Oeste", "variant": 2}, {"id": "trio-pvp-0", "team": "trio", "category": "pvp", "n": 3, "title": "Cobertura de Cruzamento — Triângulo Urbano", "desc": "Dois operadores observam laterais enquanto o terceiro acompanha a retaguarda.", "location": "Eixo Norte", "variant": 0}, {"id": "trio-pvp-1", "team": "trio", "category": "pvp", "n": 3, "title": "Rotação entre Abrigos — Trio em Escalonamento", "desc": "Três jogadores se distribuem ao longo da calçada com espaços entre si.", "location": "Centro Urbano", "variant": 1}, {"id": "trio-pvp-2", "team": "trio", "category": "pvp", "n": 3, "title": "Proteção de Aliado — Núcleo de Recuperação", "desc": "Um jogador auxilia um aliado e os outros mantêm observação do entorno.", "location": "Quarteirão Oeste", "variant": 2}, {"id": "trio-rua-0", "team": "trio", "category": "rua", "n": 3, "title": "Travessia de Avenida — Triângulo Urbano", "desc": "Dois operadores observam laterais enquanto o terceiro acompanha a retaguarda.", "location": "Eixo Norte", "variant": 0}, {"id": "trio-rua-1", "team": "trio", "category": "rua", "n": 3, "title": "Progressão em Via Larga — Trio em Escalonamento", "desc": "Três jogadores se distribuem ao longo da calçada com espaços entre si.", "location": "Centro Urbano", "variant": 1}, {"id": "trio-rua-2", "team": "trio", "category": "rua", "n": 3, "title": "Controle de Interseção — Núcleo de Recuperação", "desc": "Um jogador auxilia um aliado e os outros mantêm observação do entorno.", "location": "Quarteirão Oeste", "variant": 2}, {"id": "squad-horda-0", "team": "squad", "category": "horda", "n": 4, "title": "Contenção de Avenida — Diamante de Rua", "desc": "Quatro operadores observam frente, laterais e retaguarda.", "location": "Eixo Norte", "variant": 0}, {"id": "squad-horda-1", "team": "squad", "category": "horda", "n": 4, "title": "Retirada Progressiva — Duas Duplas", "desc": "O grupo opera em dois pares coordenados por comunicação.", "location": "Centro Urbano", "variant": 1}, {"id": "squad-horda-2", "team": "squad", "category": "horda", "n": 4, "title": "Ponto de Reagrupamento — Linha de Observação", "desc": "Os quatro dividem os setores de uma avenida larga.", "location": "Quarteirão Oeste", "variant": 2}, {"id": "squad-pvp-0", "team": "squad", "category": "pvp", "n": 4, "title": "Cobertura de Cruzamento — Diamante de Rua", "desc": "Quatro operadores observam frente, laterais e retaguarda.", "location": "Eixo Norte", "variant": 0}, {"id": "squad-pvp-1", "team": "squad", "category": "pvp", "n": 4, "title": "Rotação entre Abrigos — Duas Duplas", "desc": "O grupo opera em dois pares coordenados por comunicação.", "location": "Centro Urbano", "variant": 1}, {"id": "squad-pvp-2", "team": "squad", "category": "pvp", "n": 4, "title": "Proteção de Aliado — Linha de Observação", "desc": "Os quatro dividem os setores de uma avenida larga.", "location": "Quarteirão Oeste", "variant": 2}, {"id": "squad-rua-0", "team": "squad", "category": "rua", "n": 4, "title": "Travessia de Avenida — Diamante de Rua", "desc": "Quatro operadores observam frente, laterais e retaguarda.", "location": "Eixo Norte", "variant": 0}, {"id": "squad-rua-1", "team": "squad", "category": "rua", "n": 4, "title": "Progressão em Via Larga — Duas Duplas", "desc": "O grupo opera em dois pares coordenados por comunicação.", "location": "Centro Urbano", "variant": 1}, {"id": "squad-rua-2", "team": "squad", "category": "rua", "n": 4, "title": "Controle de Interseção — Linha de Observação", "desc": "Os quatro dividem os setores de uma avenida larga.", "location": "Quarteirão Oeste", "variant": 2}];
+const points=[{"name": "Margem do Rio", "x": 13, "y": 21, "detail": "Observação da orla", "kind": "Rota aberta"}, {"name": "Eixo Norte", "x": 44, "y": 13, "detail": "Avenida ampla", "kind": "PvP urbano"}, {"name": "Quarteirão Oeste", "x": 24, "y": 49, "detail": "Ruas e cruzamentos", "kind": "PvP urbano"}, {"name": "Centro Urbano", "x": 55, "y": 43, "detail": "Cruzamentos centrais", "kind": "PvP urbano"}, {"name": "Setor Leste", "x": 80, "y": 36, "detail": "Acessos laterais", "kind": "PvP urbano"}, {"name": "Zona de Quarentena A", "x": 37, "y": 70, "detail": "Zona destacada", "kind": "Quarentena"}, {"name": "Zona de Quarentena B", "x": 76, "y": 73, "detail": "Zona destacada", "kind": "Quarentena"}, {"name": "Setor Sul", "x": 56, "y": 88, "detail": "Rota de retirada", "kind": "Deslocamento"}];
+const NS='http://www.w3.org/2000/svg';
+let team='duo',category='horda',zoom=1;
+function node(name,attrs={},parent){const e=document.createElementNS(NS,name);Object.entries(attrs).forEach(([k,v])=>e.setAttribute(k,v));if(parent)parent.appendChild(e);return e}
+function txt(parent,x,y,value,attrs={}){const e=node('text',{x,y,fill:'#d6e7e4','font-size':12,'font-family':'monospace',...attrs},parent);e.textContent=value;return e}
+function mapDraw(){
+const s=document.getElementById('map-svg');s.replaceChildren();
+node('rect',{width:1100,height:800,fill:'#0a202a'},s);
+node('path',{d:'M0 0H135Q100 170 158 310T120 590Q90 720 145 800H0Z',fill:'#14556a'},s);
+for(let j=0;j<16;j++)node('path',{d:`M${-40+j*11} 0 L${110+j*11} 800`,stroke:'#5cc4d7','stroke-width':1,opacity:.12},s);
+const land=node('g',{},s);
+node('path',{d:'M150 0H1100V800H150Q110 660 155 540T155 300Q115 150 150 0',fill:'#16282c',stroke:'#42646a','stroke-width':4},land);
+for(let x=180;x<1080;x+=115)node('rect',{x,y:0,width:25,height:800,fill:'#33454a'},land);
+for(let y=85;y<800;y+=115)node('rect',{x:140,y,width:960,height:26,fill:'#33454a'},land);
+node('rect',{x:570,y:0,width:50,height:800,fill:'#485b60'},land);
+node('rect',{x:140,y:390,width:960,height:50,fill:'#485b60'},land);
+for(let x=200;x<1080;x+=115)for(let y=15;y<800;y+=115){
+let w=76,h=65;
+node('rect',{x,y,width:w,height:h,rx:3,fill:(x+y)%3===0?'#40545a':'#35494d',stroke:'#62777a','stroke-width':1},land);
+node('rect',{x:x+7,y:y+7,width:w-14,height:h-14,fill:'#23343a',opacity:.65},land);
+for(let k=0;k<3;k++)node('rect',{x:x+12+k*19,y:y+12,width:11,height:7,fill:'#748e91',opacity:.4},land);
+}
+for(let y=105;y<800;y+=115)node('path',{d:`M155 ${y-7}H1090`,stroke:'#9ba7a3','stroke-dasharray':'18 22','stroke-width':2,opacity:.4},s);
+for(let x=190;x<1100;x+=115)node('path',{d:`M${x+2} 0V800`,stroke:'#9ba7a3','stroke-dasharray':'18 22','stroke-width':2,opacity:.35},s);
+const qs=[{x:380,y:565,rx:142,ry:104},{x:835,y:590,rx:150,ry:114}];
+qs.forEach((q,i)=>{
+node('ellipse',{...q,fill:'#ffd935',opacity:.23,stroke:'#ffdc37','stroke-width':5},s);
+node('ellipse',{...q,fill:'none',stroke:'#ffe55d','stroke-width':4,'stroke-dasharray':'12 8'},s);
+node('ellipse',{...q,fill:'#ffdf36',opacity:.11},s);
+txt(s,q.x,q.y-6,`QUARENTENA ${i?'B':'A'}`,{'font-size':17,'font-weight':700,'text-anchor':'middle',fill:'#fff4b5',stroke:'#2a2510','stroke-width':3,'paint-order':'stroke'});
+});
+txt(s,34,60,'HUDSON / ÁGUA',{'font-size':15,fill:'#8be1ed',transform:'rotate(90 34 60)'});
+txt(s,660,34,'AVENIDAS / SETORES ILUSTRATIVOS',{'font-size':14,fill:'#b9c7c3'});
+points.forEach((p,i)=>{
+let x=p.x*10.3+20,y=p.y*7.5+20;
+node('circle',{cx:x,cy:y,r:16,fill:p.kind==='Quarentena'?'#ffdb48':'#bff18d',opacity:.2},s);
+const dot=node('circle',{cx:x,cy:y,r:6,fill:p.kind==='Quarentena'?'#ffdf48':'#c8f593',stroke:'#091610','stroke-width':2},s);
+dot.style.cursor='pointer';dot.addEventListener('click',()=>selectPoint(i));
+txt(s,x+13,y-10,p.name.toUpperCase(),{'font-size':11,'font-weight':700,fill:'#e7eee9',stroke:'#0b181b','stroke-width':3,'paint-order':'stroke'});
+});
+}
+function selectPoint(i){document.querySelectorAll('.poi').forEach((p,j)=>p.classList.toggle('active',i===j));document.getElementById('map-svg').querySelectorAll('circle').forEach(()=>{});}
+function zoomMap(n){zoom=Math.min(2.5,Math.max(1,zoom+n*.25));document.getElementById('map-svg').style.transform=`scale(${zoom})`}
+function resetMap(){zoom=1;document.getElementById('map-svg').style.transform='scale(1)'}
+function renderPois(){document.getElementById('pois').innerHTML=points.map((p,i)=>`<button class="poi" data-i="${i}">${p.name}<small>${p.detail}</small></button>`).join('');document.querySelectorAll('.poi').forEach(b=>b.onclick=()=>selectPoint(Number(b.dataset.i)))}
+function encodeSVG(svg){return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg)}
+function diagram(f,stage){
+const n=f.n,variant=f.variant,street=f.category==='rua';
+const pos=[];
+for(let i=0;i<n;i++){
+let x=210+(i%2)*90+(variant===2?i*17:0),y=290+Math.floor(i/2)*65;
+if(stage===1){x+=55+(i%2)*18;y-=65}
+if(stage===2){x+=115+(i%2)*35;y-=120-(i%3)*8}
+pos.push([x,y]);
+}
+let svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500"><defs><pattern id="p" width="26" height="26" patternUnits="userSpaceOnUse"><path d="M26 0H0V26" fill="none" stroke="#33515a" stroke-width=".7"/></pattern><linearGradient id="road" x2="1" y2="1"><stop stop-color="#283a41"/><stop offset="1" stop-color="#1a2a31"/></linearGradient></defs><rect width="800" height="500" fill="#101f26"/><rect width="800" height="500" fill="url(#p)"/>
+<rect x="0" y="0" width="800" height="155" fill="#263a40"/><rect x="0" y="365" width="800" height="135" fill="#263a40"/>
+<rect x="0" y="155" width="800" height="210" fill="url(#road)"/>
+<path d="M0 155H800M0 365H800" stroke="#728d8d" stroke-width="5"/>
+<path d="M0 258H800" stroke="#d6c88e" stroke-width="4" stroke-dasharray="33 29" opacity=".7"/>
+<rect x="45" y="15" width="170" height="112" rx="4" fill="#3a5158" stroke="#78908c"/><rect x="550" y="18" width="207" height="105" rx="4" fill="#3a5158" stroke="#78908c"/>
+<rect x="35" y="400" width="188" height="76" rx="4" fill="#394c53" stroke="#78908c"/><rect x="585" y="398" width="173" height="75" rx="4" fill="#394c53" stroke="#78908c"/>
+<path d="M120 155V365M690 155V365" stroke="#d2d9d0" stroke-width="9" stroke-dasharray="15 10" opacity=".25"/>
+<rect x="442" y="178" width="42" height="80" rx="5" fill="#607477" stroke="#9aabaa"/><rect x="488" y="188" width="34" height="67" rx="5" fill="#607477" stroke="#9aabaa"/>
+<rect x="70" y="292" width="55" height="35" rx="6" fill="#728a91" stroke="#aec2c2"/>
+<text x="22" y="38" font-family="monospace" font-weight="bold" font-size="17" fill="#c8f18e">${f.id.toUpperCase()} / ${['INÍCIO','TRANSIÇÃO','FINAL'][stage]}</text>
+<text x="22" y="62" font-family="monospace" font-size="11" fill="#b7c7ca">VISTA SUPERIOR · CENÁRIO URBANO ILUSTRATIVO</text>
+<text x="680" y="44" font-family="monospace" font-size="15" fill="#d9e3dd">N ↑</text>`;
+if(variant===0){svg+=`<rect x="330" y="158" width="58" height="202" fill="#22353c" stroke="#9fb1ad" stroke-width="3"/><text x="342" y="245" fill="#d4e2d9" font-family="monospace" font-size="11" transform="rotate(-90 342 245)">CANTEIRO CENTRAL</text>`}
+if(variant===1){svg+=`<rect x="330" y="176" width="85" height="47" rx="8" fill="#647d84" stroke="#c0ceca" stroke-width="3"/><rect x="410" y="305" width="110" height="45" rx="8" fill="#647d84" stroke="#c0ceca" stroke-width="3"/><text x="331" y="164" fill="#f4df91" font-family="monospace" font-size="12">VEÍCULOS</text>`}
+if(variant===2){svg+=`<path d="M365 155V365M0 250H800" stroke="#f0d890" stroke-width="5" stroke-dasharray="14 15" opacity=".65"/><rect x="330" y="225" width="95" height="65" fill="#344f57" stroke="#91b8b9" stroke-width="3"/><text x="332" y="214" fill="#f4df91" font-family="monospace" font-size="12">INTERSEÇÃO</text>`}
+if(f.category==='horda'){
+for(let i=0;i<7;i++){let x=555+(i%4)*37,y=290+Math.floor(i/4)*43;svg+=`<circle cx="${x}" cy="${y}" r="11" fill="#c96d64" stroke="#ffaea4" stroke-width="2"/><text x="${x}" y="${y+4}" text-anchor="middle" font-size="9" fill="#fff">Z</text>`}
+}else if(f.category==='pvp'){
+for(let i=0;i<2;i++){svg+=`<rect x="${625+i*43}" y="${194+i*60}" width="19" height="19" transform="rotate(45 ${635+i*43} ${203+i*60})" fill="#df8c76" stroke="#ffc4a3"/>`}
+}else{
+svg+=`<path d="M520 160V360" stroke="#e7d77b" stroke-width="4" stroke-dasharray="10 10" opacity=".6"/>`;
+}
+pos.forEach(([x,y],i)=>{
+let initialX=210+(i%2)*90+(variant===2?i*17:0),initialY=290+Math.floor(i/2)*65;
+if(stage>0)svg+=`<path d="M${initialX} ${initialY}Q${initialX+65} ${initialY-65} ${x} ${y}" stroke="#c6f18e" stroke-width="3" stroke-dasharray="9 8" fill="none" opacity=".75"/>`;
+svg+=`<path d="M${x} ${y}L${x+80} ${y-58}L${x+92} ${y-18}Z" fill="#8dd8e6" opacity=".16"/><circle cx="${x}" cy="${y}" r="21" fill="#baf08c" stroke="#0a1914" stroke-width="5"/><circle cx="${x}" cy="${y}" r="14" fill="#243d31"/><text x="${x}" y="${y+5}" text-anchor="middle" font-family="monospace" font-weight="bold" font-size="17" fill="#f2ffed">${String.fromCharCode(65+i)}</text>`;
+});
+svg+=`<rect x="18" y="445" width="360" height="36" fill="#0b1519" opacity=".9"/><text x="32" y="468" font-family="monospace" font-size="14" fill="#d7e7dc">${['POSIÇÕES INICIAIS','DESLOCAMENTO COORDENADO','OBSERVAÇÃO / REAGRUPAMENTO'][stage]}</text></svg>`;
+return encodeSVG(svg);
+}
+function render(){
+document.querySelectorAll('[data-team]').forEach(b=>b.classList.toggle('active',b.dataset.team===team));
+document.querySelectorAll('[data-cat]').forEach(b=>b.classList.toggle('active',b.dataset.cat===category));
+const list=formations.filter(f=>f.team===team&&f.category===category);
+document.getElementById('count').textContent=`${list.length} FORMAÇÕES • ${list.length*3} DIAGRAMAS • ${team.toUpperCase()} / ${category.toUpperCase()}`;
+const cards=document.getElementById('cards');cards.replaceChildren();
+list.forEach((f,i)=>{
+const article=document.createElement('article');article.className='formation-card';
+article.innerHTML=`<div class="card-top"><div><div class="kicker">OPERAÇÃO ${String(i+1).padStart(2,'0')} / ${f.category.toUpperCase()}</div><h3></h3></div><span class="badge">${f.n} JOGADORES</span></div><div class="card-desc"></div><div class="stage-tabs"><button class="stage active" data-stage="0">01 / INÍCIO</button><button class="stage" data-stage="1">02 / MOVIMENTO</button><button class="stage" data-stage="2">03 / FINAL</button></div><img class="stage-image" alt=""><div class="miniatures"></div><div class="card-foot"><span>SETOR: ${f.location}</span><span>3 VISTAS ORIGINAIS</span></div>`;
+article.querySelector('h3').textContent=f.title;article.querySelector('.card-desc').textContent=f.desc;
+const imgs=[0,1,2].map(st=>diagram(f,st));
+const main=article.querySelector('.stage-image');const thumbs=article.querySelector('.miniatures');
+function stage(st){main.src=imgs[st];main.alt=`${f.title}, etapa ${st+1}, esquema superior`;article.querySelectorAll('.stage').forEach(b=>b.classList.toggle('active',Number(b.dataset.stage)===st))}
+article.querySelectorAll('.stage').forEach(b=>b.addEventListener('click',()=>stage(Number(b.dataset.stage))));
+imgs.forEach((src,j)=>{let image=document.createElement('img');image.src=src;image.alt=`Etapa ${j+1}: ${f.title}`;image.loading='lazy';image.onclick=()=>stage(j);thumbs.appendChild(image)});
+stage(0);cards.appendChild(article);
+});
+}
+document.querySelectorAll('[data-team]').forEach(b=>b.onclick=()=>{team=b.dataset.team;render()});
+document.querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>{category=b.dataset.cat;render()});
+render();
+
+const radioCalls=[
+["contato","CONTATO, ESQUERDA","Inimigo visto à esquerda do meu setor."],
+["contato","CONTATO, DIREITA","Inimigo visto à direita do meu setor."],
+["contato","CONTATO, FRENTE","Inimigo à frente da minha posição."],
+["contato","CONTATO, MINHA POSIÇÃO","Inimigo próximo de mim."],
+["contato","CONTATO, ATRÁS","Ameaça na retaguarda da equipe."],
+["contato","SEM VISUAL","Perdi o inimigo de vista."],
+["equipe","PRECISO DE APOIO","Preciso de ajuda no meu setor."],
+["equipe","TÔ CAÍDO","Fui derrubado e preciso de recuperação."],
+["equipe","TÔ SEM MUNIÇÃO","Não consigo manter o mesmo ritmo de combate."],
+["equipe","TÔ RECARREGANDO","Preciso de alguns segundos."],
+["equipe","TÔ CONTIGO","Estou acompanhando sua posição."],
+["equipe","TODO MUNDO OK?","Confirmem a situação da equipe."],
+["movimento","REAGRUPA","Voltem para o mesmo ponto."],
+["movimento","RECUA","Vamos sair desta posição."],
+["movimento","SEGURA AÍ","Aguarde o restante do grupo."],
+["movimento","VOU CRUZAR","Vou atravessar a rua."],
+["movimento","RUA LIVRE","Não vejo ameaça na via observada."],
+["movimento","MARCA NO MAPA","Indique o local para todos."],
+["franco","Visual no alvo","Observador identificou um jogador adversário no jogo."],
+["franco","Alvo marcado","Observador marcou a posição para o franco."],
+["franco","Confirma visual","Franco confirma que encontrou o marcador."],
+["franco","Sem visual","Franco não encontrou o jogador indicado."],
+["franco","Aguarda sinal","Franco espera a confirmação do observador."],
+["franco","Liberado","Observador autoriza a ação combinada no jogo."],
+["franco","Segura","Observador cancela a autorização."],
+["franco","Alvo saiu","Jogador adversário deixou o ponto marcado."],
+["franco","Reposicionando","Um dos dois vai trocar de posição."],
+["franco","Dupla reunida","Observador e franco estão juntos novamente."],
+["horda","HORDA VINDO","Infectados se aproximando."],
+["horda","HORDA À ESQUERDA","Infectados pelo setor esquerdo."],
+["horda","HORDA À DIREITA","Infectados pelo setor direito."],
+["horda","TAMO CERCADO","Múltiplas aproximações."],
+["horda","ABRE CAMINHO","Precisamos de uma rota livre."],
+["horda","SAÍDA LIVRE","Caminho de retirada observado sem ameaças."]
+];
+let radioCat='todos';
+function drawCalls(){
+const q=document.getElementById('commsSearch').value.toLocaleLowerCase('pt-BR');
+const grid=document.getElementById('commsGrid');grid.replaceChildren();
+const filtered=radioCalls.filter(c=>(radioCat==='todos'||c[0]===radioCat)&&c.join(' ').toLocaleLowerCase('pt-BR').includes(q));
+if(!filtered.length){const empty=document.createElement('p');empty.textContent='Nenhuma chamada encontrada.';empty.style.color='#a9c1bc';grid.appendChild(empty);return}
+filtered.forEach(([cat,call,meaning])=>{
+const b=document.createElement('button');b.className='call';b.type='button';
+const info=document.createElement('span');const title=document.createElement('strong');title.textContent=call;const small=document.createElement('small');small.textContent=meaning;info.append(title,small);
+const copy=document.createElement('span');copy.className='copy-icon';copy.textContent='COPIAR';
+b.append(info,copy);b.addEventListener('click',async()=>{
+try{await navigator.clipboard.writeText(call);showRadioToast('Frase copiada')}catch(e){showRadioToast(call)}
+});grid.appendChild(b)
+});
+}
+let toastTimer;
+function showRadioToast(message){const t=document.getElementById('radioToast');t.textContent=message;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),1800)}
+document.querySelectorAll('[data-radio]').forEach(b=>b.addEventListener('click',()=>{
+radioCat=b.dataset.radio;document.querySelectorAll('[data-radio]').forEach(el=>el.classList.toggle('active',el===b));drawCalls();
+}));
+document.getElementById('commsSearch').addEventListener('input',drawCalls);
+drawCalls();
+</script>
+<style>
+#brm5-map-fullscreen:fullscreen,#brm5-map-fullscreen:-webkit-full-screen{background:#071116;display:flex;flex-direction:column;width:100vw;height:100vh;max-width:none;max-height:none;margin:0;padding:0;border:0;border-radius:0}
+#brm5-map-fullscreen:fullscreen iframe,#brm5-map-fullscreen:-webkit-full-screen iframe{flex:1 1 auto!important;width:100%!important;height:auto!important;min-height:0!important}
+#brm5-map-fullscreen:fullscreen .map-toolbar,#brm5-map-fullscreen:-webkit-full-screen .map-toolbar{flex-shrink:0}
+#brm5-map-fullscreen:fullscreen .map-caption,#brm5-map-fullscreen:-webkit-full-screen .map-caption{flex-shrink:0}
+#brm5-map-fullscreen.map-fs-fallback{position:fixed!important;inset:0!important;z-index:2147483000!important;display:flex!important;flex-direction:column!important;width:100vw!important;height:100dvh!important;margin:0!important;padding:0!important;background:#071116!important}
+#brm5-map-fullscreen.map-fs-fallback iframe{flex:1 1 auto!important;height:100%!important;min-height:0!important}
+body.brm5-map-lock{overflow:hidden!important}
+</style>
+<script>
+(function(){
+const panel=document.getElementById('brm5-map-fullscreen');
+const button=document.getElementById('brm5-fullscreen-toggle');
+if(!panel||!button)return;
+const isFullscreen=()=>document.fullscreenElement===panel||document.webkitFullscreenElement===panel||panel.classList.contains('map-fs-fallback');
+function update(){const on=isFullscreen();button.textContent=on?'⤢ SAIR DA TELA CHEIA':'⛶ TELA CHEIA';button.setAttribute('aria-label',on?'Sair da tela cheia':'Exibir somente o mapa em tela cheia');}
+async function toggle(){
+ if(isFullscreen()){
+  if(document.fullscreenElement&&document.exitFullscreen){try{await document.exitFullscreen()}catch(e){}}
+  else if(document.webkitFullscreenElement&&document.webkitExitFullscreen){document.webkitExitFullscreen()}
+  panel.classList.remove('map-fs-fallback');document.body.classList.remove('brm5-map-lock');update();return;
+ }
+ if(panel.requestFullscreen){try{await panel.requestFullscreen();update();return}catch(e){}}
+ if(panel.webkitRequestFullscreen){try{panel.webkitRequestFullscreen();update();return}catch(e){}}
+ panel.classList.add('map-fs-fallback');document.body.classList.add('brm5-map-lock');update();
+}
+button.addEventListener('click',toggle);
+document.addEventListener('fullscreenchange',update);
+document.addEventListener('webkitfullscreenchange',update);
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&panel.classList.contains('map-fs-fallback')){panel.classList.remove('map-fs-fallback');document.body.classList.remove('brm5-map-lock');update()}});
+})();
+</script>
+</body></html>
